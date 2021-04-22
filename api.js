@@ -67,8 +67,8 @@ app.get('/queries/getTasksByDepartment', (req,res,next) => {
 });
 
 //get tasks by user
-app.get('/queries/getTasksByUser', (req,res,next) => {
-  getConnection.query("SELECT * FROM employee e, emp_task et, task t WHERE e.empId = et.empId AND t.taskId = et.taskId", function (err, result, fields) {
+app.get('/queries/getTasksByUserWAT', (req,res,next) => {
+  getConnection.query("SELECT * FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND t.taskId = et.taskId", function (err, result, fields) {
     if (err) throw err;
     res.json(result);
   })
@@ -76,10 +76,29 @@ app.get('/queries/getTasksByUser', (req,res,next) => {
 
 //get all tasks (task should have the department, the employee, and the task information on it)
 app.get('/queries/getTasksByUser', (req,res,next) => {
-  getConnection.query("SELECT * FROM department d, employee e, emp_task et, task t WHERE d.deptId = dt.deptId AND e.empId = et.empId AND t.taskId = et.taskId AND t.taskId = dt.taskId", function (err, result, fields) {
+  let selectFrom = `SELECT * FROM dept_task dt, task t, emp_task et, employees e, department d`
+  let where = `WHERE dt.taskId = t.taskId	AND et.taskId = t.taskId AND e.empId = et.empId AND d.deptId = dt.deptId`
+  let con = getConnection();
+  con.query(`${selectFrom} ${where};`, function (err, result, fields) {
     if (err) throw err;
-    res.json(result);
+    let output = {}
+    console.log(result);
+    result.forEach((row) => {
+      output[row.taskId] = {
+        taskTitle : row.taskTitle,
+        deptId : row.deptId,
+        status : row.status,
+        createDate : row.createDate,
+        dueDate : row.dueDate,
+        priority : row.priority,
+        description : row.description,
+        assignedTo: `${row.fname} ${row.lname}`,
+        deptName: row.deptName,
+      }  
+    })
+    res.json(output);
   })
+  con.end();
 });
 
 //get task count for all departments
@@ -132,7 +151,7 @@ app.get('/queries/getTaskId', (req,res) => {
 //add a task to the db
 app.post('/posts/addTask', (req,res) => {
   let body = req.body;
-  let sqlTask = `INSERT INTO task (taskId, dueDate, createDate, status, priority, description) VALUES ('${body.taskId}', '${body.dueDate}', '${body.createDate}', '${body.status}', '${body.priority}', '${body.description}')`
+  let sqlTask = `INSERT INTO task (taskTitle, taskId, dueDate, createDate, status, priority, description) VALUES ('${body.taskTitle}','${body.taskId}', '${body.dueDate}', '${body.createDate}', '${body.status}', '${body.priority}', '${body.description}')`
   let sqlDept = `INSERT INTO dept_task (taskId, deptId) VALUES ('${body.taskId}', '${body.deptId}')`
   let sqlEmp = `INSERT INTO emp_task (taskId, empId) VALUES ('${body.taskId}', '${body.empId}')`
   let con = getConnection()
