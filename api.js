@@ -11,7 +11,8 @@ const getConnection = () => {
     host: 'us-cdbr-east-03.cleardb.com',
     user: 'b544be9947b187',
     password: '337d07ea',
-    database: "heroku_9c6c8776a0ac640"
+    database: "heroku_9c6c8776a0ac640",
+    multipleStatements:true
   });
   return con
 }
@@ -76,13 +77,14 @@ app.get('/queries/getTasksByUserWAT', (req,res,next) => {
 
 //get all tasks (task should have the department, the employee, and the task information on it)
 app.get('/queries/getTasksByUser', (req,res,next) => {
+  let d = new Date();
+  console.log(`Fulfilling get tasks request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
   let selectFrom = `SELECT * FROM dept_task dt, task t, emp_task et, employees e, department d`
   let where = `WHERE dt.taskId = t.taskId	AND et.taskId = t.taskId AND e.empId = et.empId AND d.deptId = dt.deptId`
   let con = getConnection();
   con.query(`${selectFrom} ${where};`, function (err, result, fields) {
     if (err) throw err;
     let output = {}
-    console.log(result);
     result.forEach((row) => {
       output[row.taskId] = {
         taskTitle : row.taskTitle,
@@ -111,18 +113,22 @@ app.get('/queries/getTotalTaskCount', (req,res,next) => {
 
 //get task count of department
 app.get('/queries/getTaskCountOfDepartment', (req,res,next) => {
-  getConnection.query("SELECT d.deptId d.deptName COUNT(dt.taskId) AS cnt FROM dept_task dt, department d WHERE d.deptd = dt.deptId GROUP BY dt.deptId", function (err,result,field) {
+  let con = getConnection();
+  con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d WHERE d.deptId = dt.deptId GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
     if(err) throw err;
     res.json(result);
   })
+  con.end();
 })
 
 //get task count of user
-app.get('/queries/getCountOfUser', (req,res,next) => {
-  getConnection.query("SELECT COUNT(et.taskId) AS cnt FROM emp_task et GROUP BY et.empId", function (err,result,field) {
+app.get('/queries/getTaskCountOfUser', (req,res,next) => {
+  let con = getConnection();
+  con.query(`SELECT e.empId, CONCAT(e.fname,' ',e.lname) AS name, COUNT(et.taskId) as taskCount FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND et.taskId = t.taskId GROUP BY e.empId, e.fname, e.lname`, function (err,result,field) {
     if(err) throw err;
     res.json(result);
   })
+  con.end();
 })
 
 //get task count for all users
