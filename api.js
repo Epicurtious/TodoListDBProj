@@ -187,7 +187,7 @@ app.post('/posts/updateTask', (req, res) => {
     if (err) throw err;
   })
   res.json({task:"accepted"});
-  // con.end();
+  con.end();
 })
 
 
