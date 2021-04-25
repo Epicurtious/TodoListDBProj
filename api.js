@@ -111,7 +111,7 @@ app.get('/queries/getTaskCountOfDepartment', (req,res,next) => {
   let d = new Date();
   console.log(`Fulfilling get task count of department request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
   let con = getConnection();
-  con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d WHERE d.deptId = dt.deptId GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
+  con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d WHERE d.deptId = dt.deptId AND t.taskStatus != 'Closed' GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
     if(err) throw err;
     res.json(result);
   })
@@ -123,7 +123,7 @@ app.get('/queries/getTaskCountOfUser', (req,res,next) => {
   let d = new Date();
   console.log(`Fulfilling get task count of user request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
   let con = getConnection();
-  con.query(`SELECT e.empId, CONCAT(e.fname,' ',e.lname) AS name, COUNT(et.taskId) as taskCount FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND et.taskId = t.taskId GROUP BY e.empId, e.fname, e.lname`, function (err,result,field) {
+  con.query(`SELECT e.empId, CONCAT(e.fname,' ',e.lname) AS name, COUNT(et.taskId) as taskCount FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND et.taskId = t.taskId AND t.taskStatus != 'Closed' GROUP BY e.empId, e.fname, e.lname`, function (err,result,field) {
     if(err) throw err;
     res.json(result);
   })
