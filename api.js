@@ -191,5 +191,23 @@ app.post('/posts/updateTask', (req, res) => {
   con.end();
 })
 
-
-//maybe login?
+//login
+//  finding username
+//  verifying password
+app.post('/posts/login', (req, res) => {
+  let d = new Date();
+  console.log(`Fulfilling login request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
+  let body = req.body;
+  let sql = `SELECT * FROM users u WHERE u.username='${body.username}' AND u.pass='${body.pass}'`
+  let con = getConnection();
+  con.query(sql, function (err, result, fields) {
+    if (err) throw err;
+    // checks if results contains anything to verify login
+    if(result.length == 0){
+      res.json({"authenticated": false})
+    } else {
+      res.json({"authenticated": true})
+    }
+  })
+  con.end()
+})
