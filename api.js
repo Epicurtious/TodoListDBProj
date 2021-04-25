@@ -85,6 +85,7 @@ app.get('/queries/getTasksByUser', (req,res,next) => {
         description : row.description,
         assignedTo: `${row.fname} ${row.lname}`,
         deptName: row.deptName,
+        empId: row.empId
       }  
     })
     res.json(output);
