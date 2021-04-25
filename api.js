@@ -111,7 +111,7 @@ app.get('/queries/getTaskCountOfDepartment', (req,res,next) => {
   let d = new Date();
   console.log(`Fulfilling get task count of department request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
   let con = getConnection();
-  con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d WHERE d.deptId = dt.deptId AND t.taskStatus != 'Closed' GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
+  con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d, task t WHERE d.deptId = dt.deptId AND dt.taskId = t.taskId AND t.taskStatus != 'Closed' GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
     if(err) throw err;
     res.json(result);
   })
