@@ -89,7 +89,7 @@ app.get('/queries/getTasksByUser', (req,res,next) => {
       output[row.taskId] = {
         taskTitle : row.taskTitle,
         deptId : row.deptId,
-        status : row.status,
+        status : row.taskStatus,
         createDate : row.createDate,
         dueDate : row.dueDate,
         priority : row.priority,
@@ -109,6 +109,15 @@ app.get('/queries/getTotalTaskCount', (req,res,next) => {
     if(err) throw err;
     res.json(result);
   })
+})
+
+app.get('/queries/getTaskCountByStatus', (req,res,next) => {
+  let con = getConnection();
+  con.query(`SELECT t.taskStatus, COUNT(t.taskId) as taskCount FROM task t WHERE t.taskStatus != 'Closed' GROUP BY t.taskStatus;`, function (err,result,field) {
+    if (err) throw err;
+    res.json(result);
+  })
+  con.end();
 })
 
 //get task count of department
@@ -157,7 +166,7 @@ app.get('/queries/getTaskId', (req,res) => {
 //add a task to the db
 app.post('/posts/addTask', (req,res) => {
   let body = req.body;
-  let sqlTask = `INSERT INTO task (taskTitle, taskId, dueDate, createDate, status, priority, description) VALUES ('${body.taskTitle}','${body.taskId}', '${body.dueDate}', '${body.createDate}', '${body.status}', '${body.priority}', '${body.description}')`
+  let sqlTask = `INSERT INTO task (taskTitle, taskId, dueDate, createDate, taskStatus, priority, description) VALUES ('${body.taskTitle}','${body.taskId}', '${body.dueDate}', '${body.createDate}', '${body.status}', '${body.priority}', '${body.description}')`
   let sqlDept = `INSERT INTO dept_task (taskId, deptId) VALUES ('${body.taskId}', '${body.deptId}')`
   let sqlEmp = `INSERT INTO emp_task (taskId, empId) VALUES ('${body.taskId}', '${body.empId}')`
   let con = getConnection()
