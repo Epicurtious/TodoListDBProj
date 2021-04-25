@@ -59,21 +59,6 @@ app.get('/queries/getEmployees', (req,res,next) => {
   con.end();
 });
 
-//get tasks by department
-app.get('/queries/getTasksByDepartment', (req,res,next) => {
-  getConnection.query("SELECT * FROM department d, dept_task dt, task t WHERE d.deptId = dt.deptId AND t.taskId = dt.taskId", function (err, result, fields) {
-    if (err) throw err;
-    res.json(result);
-  })
-});
-
-//get tasks by user
-app.get('/queries/getTasksByUserWAT', (req,res,next) => {
-  getConnection.query("SELECT * FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND t.taskId = et.taskId", function (err, result, fields) {
-    if (err) throw err;
-    res.json(result);
-  })
-});
 
 //get all tasks (task should have the department, the employee, and the task information on it)
 app.get('/queries/getTasksByUser', (req,res,next) => {
@@ -103,14 +88,8 @@ app.get('/queries/getTasksByUser', (req,res,next) => {
   con.end();
 });
 
-//get task count for all departments
-app.get('/queries/getTotalTaskCount', (req,res,next) => {
-  getConnection.query("SELECT COUNT(taskId) FROM dept_task", function (err,result,field) {
-    if(err) throw err;
-    res.json(result);
-  })
-})
 
+//gets the task count of each status
 app.get('/queries/getTaskCountByStatus', (req,res,next) => {
   let con = getConnection();
   con.query(`SELECT t.taskStatus, COUNT(t.taskId) as taskCount FROM task t WHERE t.taskStatus != 'Closed' GROUP BY t.taskStatus;`, function (err,result,field) {
@@ -120,7 +99,7 @@ app.get('/queries/getTaskCountByStatus', (req,res,next) => {
   con.end();
 })
 
-//get task count of department
+//get task count of each department
 app.get('/queries/getTaskCountOfDepartment', (req,res,next) => {
   let con = getConnection();
   con.query(`SELECT d.deptId, d.deptName, COUNT(dt.taskId) as taskCount FROM dept_task dt, department d WHERE d.deptId = dt.deptId GROUP BY d.deptId, d.deptName;`, function (err,result,field) {
@@ -130,7 +109,7 @@ app.get('/queries/getTaskCountOfDepartment', (req,res,next) => {
   con.end();
 })
 
-//get task count of user
+//get task count of each user
 app.get('/queries/getTaskCountOfUser', (req,res,next) => {
   let con = getConnection();
   con.query(`SELECT e.empId, CONCAT(e.fname,' ',e.lname) AS name, COUNT(et.taskId) as taskCount FROM employees e, emp_task et, task t WHERE e.empId = et.empId AND et.taskId = t.taskId GROUP BY e.empId, e.fname, e.lname`, function (err,result,field) {
@@ -139,15 +118,6 @@ app.get('/queries/getTaskCountOfUser', (req,res,next) => {
   })
   con.end();
 })
-
-//get task count for all users
-app.get('/queries/getCountOfAllUser', (req,res,next) => {
-  getConnection.query("SELECT COUNT(taskId) FROM emp_task", function (err,result,field) {
-    if(err) throw err;
-    res.json(result);
-  })
-})
-
 
 
 //get task Id
@@ -182,3 +152,12 @@ app.post('/posts/addTask', (req,res) => {
   res.json({task:"accepted"});
   con.end();
 });
+
+
+//update a task in the DB
+app.post('/posts/updateTask', (req, res) => {
+  //do stuff
+})
+
+
+//maybe login?
