@@ -5,6 +5,7 @@ var app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
+const port = process.env.PORT || 5000
 
 const getConnection = () => {
   let con = mysql.createConnection({
@@ -17,8 +18,8 @@ const getConnection = () => {
   return con
 }
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
 
 //get all departments
@@ -35,7 +36,7 @@ app.get('/queries/getDepartments', (req,res,next) => {
         "deptBld": element["deptBld"]
       }
     })
-    res.send(JSON.stringify(output));
+    res.json(output);
   })
   con.end()
 });
