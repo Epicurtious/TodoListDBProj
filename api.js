@@ -35,7 +35,7 @@ app.get('/queries/getDepartments', (req,res,next) => {
         "deptBld": element["deptBld"]
       }
     })
-    res.json(output);
+    res.send(JSON.stringify(output));
   })
   con.end()
 });
