@@ -63,7 +63,6 @@ app.get('/queries/getEmployees', (req,res,next) => {
   con.end();
 });
 
-
 //get all tasks (task should have the department, the employee, and the task information on it)
 app.get('/queries/getTasksByUser', (req,res,next) => {
   let d = new Date();
@@ -92,7 +91,6 @@ app.get('/queries/getTasksByUser', (req,res,next) => {
   })
   con.end();
 });
-
 
 //gets the task count of each status
 app.get('/queries/getTaskCountByStatus', (req,res,next) => {
@@ -129,7 +127,6 @@ app.get('/queries/getTaskCountOfUser', (req,res,next) => {
   })
   con.end();
 })
-
 
 //get task Id
 app.get('/queries/getTaskId', (req,res) => {
@@ -168,7 +165,6 @@ app.post('/posts/addTask', (req,res) => {
   con.end();
 });
 
-
 //update a task in the DB
 app.post('/posts/updateTask', (req, res) => {
   let d = new Date();
@@ -192,8 +188,6 @@ app.post('/posts/updateTask', (req, res) => {
 })
 
 //login
-//  finding username
-//  verifying password
 app.post('/posts/login', (req, res) => {
   let d = new Date();
   console.log(`Fulfilling login request at ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`)
